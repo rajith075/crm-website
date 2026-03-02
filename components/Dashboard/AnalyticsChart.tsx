@@ -70,17 +70,17 @@ export default function AnalyticsChart() {
           />
 
           <YAxis
-            stroke="rgba(255,255,255,0.4)"
+            stroke="rgba(109, 104, 104, 0.4)"
             tickLine={false}
             axisLine={false}
           />
 
           <Tooltip
             contentStyle={{
-              backgroundColor: "#1A1A1F",
+              backgroundColor: "#f5f5fa",
               border: "1px solid rgba(255,255,255,0.05)",
               borderRadius: "12px",
-              color: "#fff",
+              color: "#0a0909",
             }}
           />
 
