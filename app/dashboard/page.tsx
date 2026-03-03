@@ -1,17 +1,7 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-
-export function proxy(request: NextRequest) {
-  // Example: protect dashboard routes
-  const token = request.cookies.get("token");
-
-  if (!token && request.nextUrl.pathname.startsWith("/dashboard")) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  return NextResponse.next();
+export default function DashboardPage() {
+  return (
+    <div>
+      <h1>Dashboard</h1>
+    </div>
+  );
 }
-
-export const config = {
-  matcher: ["/dashboard/:path*"],
-};
