@@ -96,6 +96,14 @@ export default function AdminLogin() {
     <span className="text-white">Admin@123</span>
   </p>
 </div>
+<div className="mt-6 text-center">
+  <a
+    href="/contact"
+    className="inline-block mt-3 text-sm text-orange-400 hover:underline"
+  >
+    Open Contact Form (User View)
+  </a>
+</div>
 
             {error && (
               <p className="text-red-400 text-center text-sm">
