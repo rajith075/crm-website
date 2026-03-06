@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 import Sidebar from "@/components/layout/Sidebar";
@@ -9,6 +10,9 @@ import AnalyticsChart from "@/components/Dashboard/AnalyticsChart";
 import RevenueChart from "@/components/Dashboard/RevenueChart";
 
 export default function Dashboard() {
+  const router = useRouter();
+  const [authorized, setAuthorized] = useState(false);
+
   const [leads, setLeads] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -28,7 +32,22 @@ export default function Dashboard() {
     }
   }
 
+  // 🔐 Logout function
+  const handleLogout = () => {
+    localStorage.removeItem("isAdmin");
+    router.replace("/admin-login");
+  };
+
   useEffect(() => {
+    const isAdmin = localStorage.getItem("isAdmin");
+
+    if (!isAdmin) {
+      router.replace("/admin-login");
+      return;
+    }
+
+    setAuthorized(true);
+
     fetchLeads();
 
     const channel = supabase
@@ -45,22 +64,24 @@ export default function Dashboard() {
     };
   }, []);
 
-  // 🔎 Filter by name
   const filteredLeads = leads.filter((lead) =>
     lead.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  const updateLead = async (id: string, field: string, value: string) => {
-  const { error } = await supabase
-    .from("leads")
-    .update({ [field]: value })
-    .eq("id", id);
 
-  if (error) {
-    console.error("Update error:", error.message);
-  } else {
-    fetchLeads(); // refresh data
-  }
-};
+  const updateLead = async (id: string, field: string, value: string) => {
+    const { error } = await supabase
+      .from("leads")
+      .update({ [field]: value })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Update error:", error.message);
+    } else {
+      fetchLeads();
+    }
+  };
+
+  if (!authorized) return null;
 
   return (
     <div className="relative min-h-screen bg-[#0B0B0F] text-white overflow-hidden">
@@ -75,6 +96,7 @@ export default function Dashboard() {
 
         <div className="flex-1 p-8">
 
+          {/* HEADER */}
           <div className="flex justify-between items-center mb-10">
             <div className="text-sm text-gray-400">
               <span className="text-white">Home</span> &gt; Overviews
@@ -89,6 +111,14 @@ export default function Dashboard() {
                 focus:shadow-[0_0_0_1px_rgba(255,140,0,0.4)]
                 transition-all duration-300 w-64"
               />
+
+              {/* LOGOUT BUTTON */}
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-xl text-sm transition"
+              >
+                Logout
+              </button>
 
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full bg-orange-500/20 flex items-center justify-center">
@@ -121,25 +151,12 @@ export default function Dashboard() {
                   List Deals
                 </h3>
 
-                {/* 🔎 Search Bar */}
                 <input
                   type="text"
                   placeholder="Search by name..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="
-                    bg-[#121217]
-                    border border-white/[0.06]
-                    rounded-2xl
-                    px-5 py-2.5
-                    text-sm
-                    w-72
-                    placeholder:text-gray-500
-                    focus:outline-none
-                    focus:border-orange-400/60
-                    focus:shadow-[0_0_0_1px_rgba(255,140,0,0.4)]
-                    transition-all duration-300
-                  "
+                  className="bg-[#121217] border border-white/[0.06] rounded-2xl px-5 py-2.5 text-sm w-72 placeholder:text-gray-500 focus:outline-none focus:border-orange-400/60 focus:shadow-[0_0_0_1px_rgba(255,140,0,0.4)] transition-all duration-300"
                 />
               </div>
 
@@ -174,32 +191,35 @@ export default function Dashboard() {
                           <td className="px-8 py-6 text-gray-400">{lead.email}</td>
                           <td className="px-8 py-6 text-gray-400">{lead.phone || "—"}</td>
                           <td className="px-8 py-6">{lead.message}</td>
+
                           <td className="px-8 py-6">
-  <select
-    value={lead.status}
-    onChange={(e) =>
-      updateLead(lead.id, "status", e.target.value)
-    }
-    className="bg-[#101014] border border-white/10 rounded px-3 py-1 text-sm"
-  >
-    <option value="New">New</option>
-    <option value="Contacted">Contacted</option>
-    <option value="Converted">Converted</option>
-    <option value="Lost">Lost</option>
-    <option value="Old">Old</option>
-  </select>
-</td>
+                            <select
+                              value={lead.status}
+                              onChange={(e) =>
+                                updateLead(lead.id, "status", e.target.value)
+                              }
+                              className="bg-[#101014] border border-white/10 rounded px-3 py-1 text-sm"
+                            >
+                              <option value="New">New</option>
+                              <option value="Contacted">Contacted</option>
+                              <option value="Converted">Converted</option>
+                              <option value="Lost">Lost</option>
+                              <option value="Old">Old</option>
+                            </select>
+                          </td>
+
                           <td className="px-8 py-6">
-  <input
-    type="text"
-    value={lead.notes || ""}
-    onChange={(e) =>
-      updateLead(lead.id, "notes", e.target.value)
-    }
-    placeholder="Add note..."
-    className="bg-[#101014] border border-white/10 rounded px-3 py-1 text-sm w-full"
-  />
-</td>
+                            <input
+                              type="text"
+                              value={lead.notes || ""}
+                              onChange={(e) =>
+                                updateLead(lead.id, "notes", e.target.value)
+                              }
+                              placeholder="Add note..."
+                              className="bg-[#101014] border border-white/10 rounded px-3 py-1 text-sm w-full"
+                            />
+                          </td>
+
                         </tr>
                       ))
                     )}
