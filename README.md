@@ -1,6 +1,4 @@
 
-ADMIN GMAIL:admin@crm.com
-ADMIN PASS:Admin@123
 # 🚀 Client Lead Management System (Mini CRM)
 
 A modern, full-stack **Client Lead Management System** built using

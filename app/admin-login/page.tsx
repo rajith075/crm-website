@@ -83,6 +83,19 @@ export default function AdminLogin() {
             >
               Enter Dashboard
             </button>
+            <div className="mt-6 text-center text-sm text-gray-400">
+  <p className="mb-1 text-gray-500">Demo Admin Credentials</p>
+
+  <p>
+    <span className="text-gray-500">Email:</span>{" "}
+    <span className="text-white">admin@crm.com</span>
+  </p>
+
+  <p>
+    <span className="text-gray-500">Password:</span>{" "}
+    <span className="text-white">Admin@123</span>
+  </p>
+</div>
 
             {error && (
               <p className="text-red-400 text-center text-sm">
